@@ -1,10 +1,30 @@
 import Recipe from "../models/Recipe.js";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const createRecipe = async (req, res) => {
   try {
-    const newRecipe = new Recipe(req.body);
-    await newRecipe.save();
-    res.status(201).json(newRecipe);
+    
+    const { title } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `Generate a description for ${title}. For 2-3 sentences.`;
+
+    const result = await model.generateContent(prompt);
+    const aiDescription = result.response.text();
+
+    const newRecipe = new Recipe({
+      title,
+      description: aiDescription,
+    });
+
+    const savedRecipe = await newRecipe.save();
+    res.status(201).json(savedRecipe);
   } catch (error) {
     res
       .status(500)
