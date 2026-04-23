@@ -3,7 +3,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const createRecipe = async (req, res) => {
   try {
-    
     const { title } = req.body;
 
     if (!title) {
@@ -11,9 +10,9 @@ export const createRecipe = async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const prompt = `Generate a description for ${title}. For 2-3 sentences.`;
+    const prompt = `Generate a description for ${title}. For 2-3 sentences. In Ukrainian. Please, make it engaging and informative. Give just one the best answer. Do not include any additional information.`;
 
     const result = await model.generateContent(prompt);
     const aiDescription = result.response.text();
